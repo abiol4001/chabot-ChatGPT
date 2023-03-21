@@ -10,7 +10,7 @@ import {
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 
-const API_KEY = process.env.REACT_APP_API_KEY;
+const API_KEY = "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";
 function App() {
   const [typing, setTyping] = useState(false);
   const [messages, setMessages] = useState([
@@ -82,7 +82,7 @@ function App() {
 
   return (
     <div className="App">
-      <div style={{ position: "relative", height: "800px", width: "700px" }}>
+      <div style={{ position: "relative", height: "750px", width: "700px" }}>
         <MainContainer>
           <ChatContainer>
             <MessageList
