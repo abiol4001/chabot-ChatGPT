@@ -11,6 +11,8 @@ import {
 } from "@chatscope/chat-ui-kit-react";
 
 const API_KEY = process.env.REACT_APP_API_KEY;
+
+
 function App() {
   const [typing, setTyping] = useState(false);
   const [messages, setMessages] = useState([
@@ -37,47 +39,51 @@ function App() {
   };
 
   async function processMessageToChatGPT(chatMessages) {
-    let apiMessages = chatMessages.map((messageObject) => {
-      let role = "";
-      if (messageObject.sender === "ChatGPT") {
-        role = "assistant";
-      } else {
-        role = "user";
-      }
-      return { role: role, content: messageObject.message };
-    });
-
-    const systemMessage = {
-      role: "system",
-      content: "Explain all concepts professionally",
-    };
-
-    const apiRequestBody = {
-      model: "gpt-3.5-turbo",
-      messages: [systemMessage, ...apiMessages],
-    };
-
-    await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + API_KEY,
-      },
-      body: JSON.stringify(apiRequestBody),
-    })
-      .then((data) => data.json())
-      .then((data) => {
-        console.log(data.choices[0].message.content);
-        setMessages([
-          ...chatMessages,
-          {
-            message: data.choices[0].message.content,
-            sender: "ChatGPT",
-          },
-        ]);
+    try {
+      let apiMessages = chatMessages.map((messageObject) => {
+        let role = "";
+        if (messageObject.sender === "ChatGPT") {
+          role = "assistant";
+        } else {
+          role = "user";
+        }
+        return { role: role, content: messageObject.message };
       });
-    ;
-    setTyping(false);
+
+      const systemMessage = {
+        role: "system",
+        content: "Explain all concepts professionally",
+      };
+
+      const apiRequestBody = {
+        model: "gpt-3.5-turbo",
+        messages: [systemMessage, ...apiMessages],
+      };
+
+      await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + API_KEY,
+        },
+        body: JSON.stringify(apiRequestBody),
+      })
+        .then((data) => data.json())
+        .then((data) => {
+          console.log(data.choices[0].message.content);
+          setMessages([
+            ...chatMessages,
+            {
+              message: data.choices[0].message.content,
+              sender: "ChatGPT",
+            },
+          ]);
+        })
+        .catch((err) => console.log(err));
+      setTyping(false);
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
