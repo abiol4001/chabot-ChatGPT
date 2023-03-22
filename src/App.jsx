@@ -13,14 +13,17 @@ import {
 const API_KEY = import.meta.env.VITE_SOME_KEY;
 
 
+const messageHistory = JSON.parse(localStorage.getItem('messageHistory'))
+
 function App() {
   const [typing, setTyping] = useState(false);
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState(messageHistory || [
     {
       message: "Hello, I am ChatGPT",
       sender: "ChatGPT",
     },
   ]);
+  
 
   const handleSend = async (message) => {
     const newMessage = {
@@ -70,14 +73,14 @@ function App() {
       })
         .then((data) => data.json())
         .then((data) => {
-          console.log(data.choices[0].message.content);
+          // console.log(data.choices[0].message.content);
           setMessages([
             ...chatMessages,
             {
               message: data.choices[0].message.content,
               sender: "ChatGPT",
             },
-          ]);
+          ])
         })
         .catch((err) => console.log(err));
       setTyping(false);
@@ -85,10 +88,16 @@ function App() {
       console.log(error)
     }
   }
+  localStorage.setItem("messageHistory", JSON.stringify(messages));
+
+  function clearHistory() {
+    localStorage.clear()
+    location.reload()
+  }
 
   return (
     <div className="App">
-      <div style={{ position: "relative", height: "750px", width: "700px" }}>
+      <div style={{ position: "relative", height: "770px", width: "700px" }}>
         <MainContainer>
           <ChatContainer>
             <MessageList
@@ -104,6 +113,7 @@ function App() {
             <MessageInput placeholder="Type message here" onSend={handleSend} />
           </ChatContainer>
         </MainContainer>
+          <button type="reset" onClick={clearHistory} style={{background: "skyblue", color: "grey", fontWeight: "300", marginTop: "10px"}}>Clear</button>
       </div>
     </div>
   );
